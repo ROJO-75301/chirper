@@ -7,10 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Chirp extends Model
 {
-    protected $fillable = [
-        'message',
-        'user_id'
-    ];
+    protected $fillable = ['message'];
 
     public function user(): BelongsTo
     {
