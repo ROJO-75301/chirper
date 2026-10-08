@@ -17,45 +17,44 @@ class ChirpController extends Controller
         return view('home', ['chirps' => $chirps]);
     }
 
-    public function create()
-    {
-        //
-    }
-
     public function store(Request $request)
     {
-        // Validate the request
         $validated = $request->validate([
-        'message' => 'required|string|max:255',
+            'message' => 'required|string|max:255',
         ]);
 
-    // Create the chirp (no user for now - we'll add auth later)
-        \App\Models\Chirp::create([
-            'message' => $validated['message'],
-            'user_id' => null, // We'll add authentication in lesson 11
+        // Use the authenticated user
+        auth()->user()->chirps()->create($validated);
+
+        return redirect('/')->with('success', 'Your chirp has been posted!');
+    }
+
+    public function edit(Chirp $chirp)
+    {
+        $this->authorize('update', $chirp);
+
+        return view('chirps.edit', compact('chirp'));
+    }
+
+    public function update(Request $request, Chirp $chirp)
+    {
+        $this->authorize('update', $chirp);
+
+        $validated = $request->validate([
+            'message' => 'required|string|max:255',
         ]);
 
-        // Redirect back to the feed
-        return redirect('/')->with('success', 'Chirp created!');
+        $chirp->update($validated);
+
+        return redirect('/')->with('success', 'Chirp updated!');
     }
 
-    public function show(string $id)
+    public function destroy(Chirp $chirp)
     {
-        //
-    }
+        $this->authorize('delete', $chirp);
 
-    public function edit(string $id)
-    {
-        //
-    }
+        $chirp->delete();
 
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    public function destroy(string $id)
-    {
-        //
+        return redirect('/')->with('success', 'Chirp deleted!');
     }
 }
